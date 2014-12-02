@@ -1,0 +1,28 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+
+<polymer-element name="events-service" attributes="events">
+  <template>
+    <style>
+    :host {
+      display: none;
+    }
+    </style>
+    <core-ajax id="ajax"
+      auto
+      url="../api/events.json"
+      on-core-response="{{eventsLoaded}}"
+      handleAs="json">
+    </core-ajax>
+  </template>
+  <script>
+  Polymer({
+    created: function() {
+      this.events = [];
+    },
+    eventsLoaded: function() {
+      this.events = this.$.ajax.response.slice(0);
+    }
+  });
+  </script>
+</polymer-element>
