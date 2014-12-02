@@ -25,7 +25,7 @@
   <script>
     Polymer({
       cardSelected: function(event, detail, sender) {
-        console.log(sender.templateInstance.model.event);
+        this.fire('show-card-details', sender.templateInstance.model.event)
       }
     });
   </script>
