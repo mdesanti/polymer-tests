@@ -1,6 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="../bower_components/google-apis/google-client-api.html">
+<link rel="import" href="../bower_components/google-apis/google-maps-api.html">
 
 <polymer-element name="events-service" attributes="events">
   <template>
@@ -10,6 +11,7 @@
     }
     </style>
     <google-client-api on-api-load="{{handleClientLoad}}"></google-client-api>
+    <google-maps-api on-api-load="{{handleMapsLoad}}" id="maps-api"></google-maps-api>
   </template>
   <script>
     Polymer({
@@ -45,7 +47,6 @@
         gapi.client.load('oauth2', 'v2', function() {
           var request = gapi.client.oauth2.userinfo.get();
           request.then(function(resp) {
-            console.log(resp.result);
             this.getCalendar(resp.result.email);
           }.bind(this), function(reason) {
             console.log('Error: ' + reason.result.error.message);
@@ -66,12 +67,24 @@
           });
 
           request.then(function(resp) {
-            console.log(resp.result.items);
+            this.buildLocation(resp.result.items)
             this.events = resp.result.items;
           }.bind(this), function(reason) {
             console.log('Error: ' + reason.result.error.message);
           });
         }.bind(this));
+      },
+      buildLocation: function(events) {
+        var geocoder = new google.maps.Geocoder();
+        for(var i = 0; i < events.length; i++) {
+          (function(calendarEvent) {
+            geocoder.geocode({address: calendarEvent.location}, function(results, status) {
+              if (status == google.maps.GeocoderStatus.OK) {
+                calendarEvent.geocodedLocation = results[0].geometry.location;
+              }
+            });
+          })(events[i]);
+        }
       }
     });
   </script>

@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/core-icon-button/core-icon-button.html">
 <link rel="import" href="../../bower_components/google-map/google-map.html">
+<link rel="import" href="../../bower_components/google-map/google-map.html">
 <link rel="import" href="../../bower_components/twbs-grid/twbs-grid.html">
 
 <polymer-element name="event-detail" attributes="event">
@@ -16,12 +17,13 @@
     }
 
     .details {
-      height: 30%
+      height: 40%
     }
 
     .map-container {
-      height: 70%;
+      height: 60%;
       margin: 10px;
+      margin-bottom: 0px;
     }
 
     </style>
@@ -33,7 +35,13 @@
       </ul>
     </bs-row>
     <bs-row class="map-container">
-      <google-map class="google-map" id="map">
+      <google-map class="google-map"
+        latitude="{{event.geocodedLocation.k | parse}}"
+        longitude="{{event.geocodedLocation.B | parse}}" id="map" fitToMarkers zoom="15">
+        <google-map-marker
+          latitude="{{event.geocodedLocation.k | parse}}"
+          longitude="{{event.geocodedLocation.B | parse}}" draggable="true">
+        </google-map-marker>
       </google-map>
     </bs-row>
 
@@ -44,6 +52,9 @@
         show: function() {
           this.$.map.resize();
         }
+      },
+      parse: function(value) {
+        return Number.parseFloat(value);
       }
     });
   </script>
