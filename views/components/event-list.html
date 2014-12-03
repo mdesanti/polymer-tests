@@ -1,21 +1,18 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/core-icon-button/core-icon-button.html">
 <link rel="import" href="event-card.html">
-<link rel="import" href="../../services/events-service.html">
 
-<polymer-element name="event-list">
+<polymer-element name="event-list" attributes="events">
   <template>
     <style>
     </style>
-
-    <events-service id="service" events="{{events}}">
-    </events-service>
 
     <template repeat="{{event in events}}">
       <event-card
         on-card-selected="{{cardSelected}}">
         <img width="70" height="70"src="../../images/avatar-01.svg">
-        <p>{{event.summary}}</p>
+        <span id="event-summary">{{event.summary}}</span>
+        <span id="time">{{event.start.datetime | formatDate}}</span>
       </event-card>
 
     </template>
@@ -25,6 +22,9 @@
     Polymer({
       cardSelected: function(event, detail, sender) {
         this.fire('show-card-details', sender.templateInstance.model.event)
+      },
+      formatDate: function(date) {
+        return moment(date).format('LL');
       }
     });
   </script>
