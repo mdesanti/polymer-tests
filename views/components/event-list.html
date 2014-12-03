@@ -12,11 +12,10 @@
     </events-service>
 
     <template repeat="{{event in events}}">
-
       <event-card
         on-card-selected="{{cardSelected}}">
-        <img width="70" height="70"src="{{event.avatar}}">
-        <p>{{event.text}}</p>
+        <img width="70" height="70"src="../../images/avatar-01.svg">
+        <p>{{event.summary}}</p>
       </event-card>
 
     </template>

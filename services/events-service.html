@@ -1,5 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="../bower_components/google-apis/google-client-api.html">
 
 <polymer-element name="events-service" attributes="events">
   <template>
@@ -8,21 +9,77 @@
       display: none;
     }
     </style>
-    <core-ajax id="ajax"
-      auto
-      url="../api/events.json"
-      on-core-response="{{eventsLoaded}}"
-      handleAs="json">
-    </core-ajax>
+    <google-client-api on-api-load="{{handleClientLoad}}"></google-client-api>
   </template>
   <script>
-  Polymer({
-    created: function() {
-      this.events = [];
-    },
-    eventsLoaded: function() {
-      this.events = this.$.ajax.response.slice(0);
-    }
-  });
+    Polymer({
+      clientId: "313803314261-jmur8cqc0pnvuhr187uuak0c5kmamqf3.apps.googleusercontent.com",
+      scopes: "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/plus.me",
+
+      me: {},
+
+      showCardDetail: function(event, detail, sender) {
+      },
+
+      handleClientLoad: function () {
+        // Step 2: Reference the API key
+        gapi.client.setApiKey('AIzaSyDODuoK137Q3JXgdYoXCE4p1XnIhqfYGss');
+        this.checkAuth();
+      },
+
+      checkAuth: function() {
+        gapi.auth.authorize({client_id: this.clientId, scope: this.scopes, immediate: true}, this.handleAuthResult.bind(this));
+      },
+
+      handleAuthResult: function (authResult) {
+        if (authResult && !authResult.error) {
+          this.getUserInfo();
+        } else {
+          this.handleAuthClick();
+        }
+      },
+
+      handleAuthClick: function (event) {
+        // Step 3: get authorization to use private data
+        gapi.auth.authorize({client_id: this.clientId, scope: this.scopes, immediate: false}, this.handleAuthResult.bind(this));
+        return false;
+      },
+      getUserInfo: function () {
+        gapi.client.load('plus', 'v1').then(function() {
+          var request = gapi.client.plus.people.get({
+            'userId': 'me'
+          });
+          // Step 6: Execute the API request
+          request.then(function(resp) {
+            this.me = resp.result;
+            this.getCalendar();
+          }.bind(this), function(reason) {
+            console.log('Error: ' + reason.result.error.message);
+          }.bind(this));
+
+        }.bind(this));
+      },
+      getCalendar: function () {
+        gapi.client.load('calendar', 'v3').then(function() {
+          var calendarId = this.me.emails[0].value;
+          var timeMin = moment().toISOString();
+          var timeMax = moment().add(1, 'days').toISOString();
+          var request = gapi.client.calendar.events.list({
+            calendarId: calendarId,
+            timeMax: timeMax,
+            timeMin: timeMin,
+            singleEvents: true,
+            orderBy: 'startTime'
+          });
+
+          request.then(function(resp) {
+            console.log(resp.result.items);
+            this.events = resp.result.items;
+          }.bind(this), function(reason) {
+            console.log('Error: ' + reason.result.error.message);
+          });
+        }.bind(this));
+      }
+    });
   </script>
 </polymer-element>
