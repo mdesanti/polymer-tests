@@ -14,7 +14,7 @@
   <script>
     Polymer({
       clientId: "313803314261-jmur8cqc0pnvuhr187uuak0c5kmamqf3.apps.googleusercontent.com",
-      scopes: "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/plus.me",
+      scopes: "https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/userinfo.email",
 
       me: {},
 
@@ -42,23 +42,19 @@
         return false;
       },
       getUserInfo: function () {
-        gapi.client.load('plus', 'v1').then(function() {
-          var request = gapi.client.plus.people.get({
-            'userId': 'me'
-          });
-          // Step 6: Execute the API request
+        gapi.client.load('oauth2', 'v2', function() {
+          var request = gapi.client.oauth2.userinfo.get();
           request.then(function(resp) {
-            this.me = resp.result;
-            this.getCalendar();
+            console.log(resp.result);
+            this.getCalendar(resp.result.email);
           }.bind(this), function(reason) {
             console.log('Error: ' + reason.result.error.message);
           }.bind(this));
-
         }.bind(this));
       },
-      getCalendar: function () {
+      getCalendar: function (email) {
         gapi.client.load('calendar', 'v3').then(function() {
-          var calendarId = this.me.emails[0].value;
+          var calendarId = email;
           var timeMin = moment().toISOString();
           var timeMax = moment().add(1, 'days').toISOString();
           var request = gapi.client.calendar.events.list({

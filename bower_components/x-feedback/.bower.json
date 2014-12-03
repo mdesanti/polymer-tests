@@ -1,0 +1,35 @@
+{
+  "name": "x-feedback",
+  "homepage": "https://github.com/RameshRM/polymer-feedback",
+  "authors": [
+    "ramahadevan <ramahadevan@ebay.com>"
+  ],
+  "description": "Polymer",
+  "keywords": [
+    "web-components",
+    "polymer",
+    "feedback"
+  ],
+  "license": "GNU GENERAL PUBLIC LICENSE",
+  "dependencies": {
+    "polymer": "Polymer/polymer",
+    "platform": "Polymer/platform"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "_release": "cb1312f315",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "cb1312f315ddb6cdda458a5dd7956467563689a7"
+  },
+  "_source": "git://github.com/RameshRM/x-feedback.git",
+  "_target": "*",
+  "_originalSource": "x-feedback",
+  "_direct": true
+}

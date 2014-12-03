@@ -1,0 +1,101 @@
+<link rel="import" href="../polymer/polymer.html">
+<polymer-element name="x-feedback" attributes="position feedbackBtnText feedbackDesc feedbackTitle cancelBtnText submitBtnText">
+<template>
+    <link rel="stylesheet" href="feedback.css">
+    <div id="feedback-btn" class="feedback" data-pos-fix="{{position}}">
+        <input class="feedback-btn" type="button" value="{{feedbackBtnText}}"></input>
+    </div>
+
+    <div id="feedback-overlay" class="feedback-overlay {{visibility}}" >
+        <div id="feedback-modal" class="feedback-modal {{visibility}}">
+            <header>{{feedbackTitle}}</header>
+            <form id="feedback-form">
+                <div>
+                    <label class="blackout-label float-clear">
+                        <span class="float-left"><b>Blackout</b> personal information: </span>
+                        <input type="checkbox" class="blackout-check float-right"></input>
+                    </label>
+                </div>
+                <h5 class="label">{{feedbackTitle}}</h5>
+
+                <textarea rows="10" cols="10"></textarea>
+                <section class="action-bar">
+
+                    <input type="submit" value="{{submitBtnText}}" class="btn btn-g"/>
+
+                    <input type="reset" value="{{cancelBtnText}}" id="reset"/>
+
+                </section>
+            </form>
+            <div class="feedback-confirm">
+                <p>Thank you for <b>Submitting Feedback</b> </p>
+                <form>
+                    <input type="submit" value="Close" class="btn btn-g"/>
+                </form>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script type="text/javascript">
+var _feedbackStates = {init:'init',prepare:'prepare',capture:'capture',complete:'complete',cancel:'cancelled'};
+
+Polymer('x-feedback', {
+    state:{},
+    visibility:'hidden',
+    feedbackDesc: '',
+    feedbackTitle: '',
+    cancelBtnText: '',
+    submitBtnText: '',
+    feedbackBtnText: 'Feedback',
+    position:'rightfix',
+    config: {
+        feedbackBtnText:'Feedback'
+    },
+    ready: function() {
+        var self = this;
+        this.addEventListener("click", function() {
+            self.state = _feedbackStates.init;
+        });
+        this.$['feedback-form'].addEventListener("reset",function(){
+            self.notifyEvent(_feedbackStates.cancel);
+        });
+        this.$['feedback-form'].addEventListener("submit",function(e){
+            self.notifyEvent(_feedbackStates.complete);
+            e.preventDefault(true);
+        });
+        highlightor.highlight(this.$['feedback-overlay']);
+    },
+    stateChanged: function(){
+        var data = null;
+        var eventName = "x-feedback-"  + this.state;
+        if(this.state === _feedbackStates.init){
+            this.visibility = "visible";
+        }else if(this.state === _feedbackStates.cancel){
+            this.visibility = "hidden";
+            this.clearState();
+        }else if(this.state === _feedbackStates.complete){
+            data = this.screenCapture();
+            this.visibility = "hidden";
+            this.clearState();
+        }
+        var feedbackEvent = new CustomEvent(eventName,{"detail":data, state: this.state});
+        document.dispatchEvent(feedbackEvent);
+    },
+    clearState: function(){
+        highlightor.clearhighlights(this.$['feedback-overlay']);
+    },
+    notifyEvent : function(currentState){
+        this.state = currentState;
+    },
+    screenCapture: function(){
+        return screenshotPage();
+    }
+});
+</script>
+
+
+<script type="text/javascript" src="screenshot.js"></script>
+<script type="text/javascript" src="highlightor.js"></script>
+</polymer-element>
+
